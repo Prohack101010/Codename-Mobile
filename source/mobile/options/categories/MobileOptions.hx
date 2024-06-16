@@ -6,12 +6,27 @@ import flixel.util.FlxTimer;
 import funkin.backend.MusicBeatState;
 import mobile.substates.MobileControlSelectSubState;
 import funkin.options.OptionsScreen;
+import funkin.options.Options;
+import lime.system.System as LimeSystem;
+#if android
+import mobile.backend.SUtil;
+#end
+#if sys
+import sys.io.File;
+#end
 
 class MobileOptions extends OptionsScreen {
-
 	var canEnter:Bool = true;
+	#if android
+	final lastStorageType:String = Options.storageType;
+	var externalPaths:Array<String> = SUtil.checkExternalPaths(true);
+	var typeNames:Array<String> = ['Data', 'Obb', 'Media', 'External'];
+	var typeVars:Array<String> = ['EXTERNAL_DATA', 'EXTERNAL_OBB', 'EXTERNAL_MEDIA', 'EXTERNAL'];
+	#end
 
 	public override function new() {
+		typeNames = typeNames.concat(externalPaths);
+		typeVars = typeVars.concat(externalPaths);
 		dpadMode = 'LEFT_FULL';
 		actionMode = 'A_B';
 		super("Mobile", 'Change Mobile Related Things such as Controls alpha, screen timeout....', null, 'LEFT_FULL', 'A_B');
@@ -39,11 +54,28 @@ class MobileOptions extends OptionsScreen {
 			"If checked, The phone will enter sleep mode if the player is inactive.",
 			"screenTimeOut"));
 		#end
+		#if android
+		add(new funkin.options.type.ArrayOption(
+			"Storage Type",
+			"Choose which folder Codename Engine should use! (CHANGING THIS MAKES DELETE YOUR OLD FOLDER!!)",
+			typeVars,
+			typeNames,
+			'storageType'));
+		#end
 	}
 
 	override function update(elapsed) super.update(elapsed);
 
-	override dynamic function onClose(o:OptionsScreen) lime.system.System.allowScreenTimeout = funkin.options.Options.screenTimeOut;
+	override public function destroy() {
+		#if mobile LimeSystem.allowScreenTimeout = Options.screenTimeOut; #end
+		#if android
+		if (Options.storageType != lastStorageType) {
+			onStorageChange();
+			funkin.backend.utils.NativeAPI.showMessageBox('Notice!', 'Storage Type has been changed and you needed restart the game!!\nPress OK to close the game.');
+			LimeSystem.exit(0);
+		}
+		#end
+	}
 
 	function changeControlsAlpha(alpha) {
 		MusicBeatState.instance.virtualPad.alpha = alpha;
@@ -68,5 +100,19 @@ class MobileOptions extends OptionsScreen {
 			FlxG.state.persistentUpdate = true;
 			new FlxTimer().start(0.2, (tmr:FlxTimer) -> canEnter = true);
 		}));
+	}
+
+	function onStorageChange():Void
+	{
+		File.saveContent(LimeSystem.applicationStorageDirectory + 'storagetype.txt', Options.storageType);
+	
+		var lastStoragePath:String = StorageType.fromStrForce(lastStorageType) + '/';
+	
+		try
+		{
+			Sys.command('rm', ['-rf', lastStoragePath]);
+		}
+		catch (e:haxe.Exception)
+			trace('Failed to remove last directory. (${e.message})');
 	}
 }
