@@ -26,8 +26,10 @@ class MobileOptions extends OptionsScreen {
 
 	public override function new() {
 		#if android
-		typeNames = typeNames.concat(externalPaths);
-		typeVars = typeVars.concat(externalPaths);
+		if (externalPaths != null && externalPaths.length > 0 || externalPaths[0] != '') {
+			typeNames = typeNames.concat(externalPaths);
+			typeVars = typeVars.concat(externalPaths);
+		}
 		#end
 		dpadMode = 'LEFT_FULL';
 		actionMode = 'A_B';
@@ -55,6 +57,10 @@ class MobileOptions extends OptionsScreen {
 			"Allow Screen Timeout",
 			"If checked, The phone will enter sleep mode if the player is inactive.",
 			"screenTimeOut"));
+		add(new funkin.options.type.Checkbox(
+			"Wide Screen",
+			"If checked, It'll change aspect ratio of the game.",
+			"wideScreen"));
 		#end
 		#if android
 		add(new funkin.options.type.ArrayOption(

@@ -158,7 +158,7 @@ class Main extends Sprite
 
 		FlxG.fixedTimestep = false;
 
-		FlxG.scaleMode = scaleMode = new FunkinRatioScaleMode();
+		if (!funkin.options.Options.wideScreen) FlxG.scaleMode = scaleMode = new FunkinRatioScaleMode();
 
 		Conductor.init();
 		AudioSwitchFix.init();
@@ -166,7 +166,7 @@ class Main extends Sprite
 		FlxG.signals.preStateSwitch.add(onStateSwitch);
 		FlxG.signals.postStateSwitch.add(onStateSwitchPost);
 
-		FlxG.mouse.useSystemCursor = !MobileControls.mobileC;
+		#if !mobile FlxG.mouse.useSystemCursor = true; #end
 
 		ModsFolder.init();
 		#if MOD_SUPPORT
@@ -200,7 +200,7 @@ class Main extends Sprite
 	}
 
 	private static function onStateSwitch() {
-		scaleMode.resetSize();
+		if (!funkin.options.Options.wideScreen) scaleMode.resetSize();
 	}
 
 	private static function onStateSwitchPost() {
