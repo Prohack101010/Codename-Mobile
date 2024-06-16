@@ -9,7 +9,7 @@ jobs:
       - name: Setup Haxe
         uses: krdlab/setup-haxe@master
         with:
-          haxe-version: 4.2.4
+          haxe-version: 4.3.4
       - name: Install Libraries
         run: |
           haxelib install hmm --quiet
@@ -17,6 +17,7 @@ jobs:
       - name: Compile
         run: haxelib run lime build windows
       - name: Upload Artifact
+        if: ${{ success() }}
         uses: actions/upload-artifact@main
         with:
           name: windowsBuild
@@ -30,7 +31,7 @@ jobs:
       - name: Setup Haxe
         uses: krdlab/setup-haxe@master
         with:
-          haxe-version: 4.2.4
+          haxe-version: 4.3.4
       - name: Install Libraries
         run: |
           DEBIAN_FRONTEND=noninteractive sudo apt-get -qq install -o Dpkg::Progress-Fancy="0" -o APT::Color="0" -o Dpkg::Use-Pty="0" libvlc-dev libvlccore-dev < /dev/null > /dev/null
@@ -39,6 +40,7 @@ jobs:
       - name: Compile
         run: haxelib run lime build linux
       - name: Upload Artifact
+        if: ${{ success() }}
         uses: actions/upload-artifact@main
         with:
           name: linuxBuild
@@ -55,7 +57,7 @@ jobs:
       - name: Setup Haxe
         uses: krdlab/setup-haxe@master
         with:
-          haxe-version: 4.2.4
+          haxe-version: 4.3.4
       - name: Install Libraries
         run: |
           haxelib install hmm --quiet
@@ -63,6 +65,7 @@ jobs:
       - name: Compile
         run: haxelib run lime build mac
       - name: Upload Artifact
+        if: ${{ success() }}
         uses: actions/upload-artifact@main
         with:
           name: macOSBuild-${{matrix.version}}
@@ -70,18 +73,26 @@ jobs:
           if-no-files-found: error
   Android:
     runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        storage-type: [EXTERNAL, MEDIA, OBB, DATA]
     steps:
       - name: Checkout
         uses: actions/checkout@main
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@main
+        id: setup-ndk
+        with:
+          ndk-version: r21e
       - name: Setup Java JDK
         uses: actions/setup-java@main
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '11'
       - name: Setup Haxe
         uses: krdlab/setup-haxe@master
         with:
-          haxe-version: 4.2.4
+          haxe-version: 4.3.4
       - name: Install Libraries
         run: |
           haxelib install hmm --quiet
@@ -89,17 +100,20 @@ jobs:
       - name: Configure Android
         run: |
           haxelib run lime config ANDROID_SDK $ANDROID_HOME
-          haxelib run lime config ANDROID_NDK_ROOT $ANDROID_NDK_LATEST_HOME
+          haxelib run lime config ANDROID_NDK_ROOT $ANDROID_NDK_HOME
           haxelib run lime config JAVA_HOME $JAVA_HOME
           haxelib run lime config ANDROID_SETUP true
-      # - name: Free Disk Space
-        # run: sudo swapoff -a && sudo rm -f /swapfile && sudo apt clean && docker rmi $(docker image ls -aq)
+        env:
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+      - name: Free Disk Space
+        run: sudo swapoff -a && sudo rm -f /swapfile && sudo apt clean && docker rmi $(docker image ls -aq) && df -h
       - name: Compile
-        run: haxelib run lime build android
+        run: haxelib run lime build android -D ${{ matrix.storage-type }}
       - name: Upload Artifact
+        if: ${{ success() }}
         uses: actions/upload-artifact@main
         with:
-          name: androidBuild
+          name: androidBuild-${{ matrix.storage-type }}
           path: export/release/android/bin/app/build/outputs/apk/release/*.apk
           if-no-files-found: error
   iOS:
@@ -116,7 +130,7 @@ jobs:
           haxelib install hmm --quiet
           haxelib run hmm install --quiet
       - name: Compile
-        run: haxelib run lime build ios -nosign
+        run: haxelib run lime build ios
       - name: Make Ipa
         run: |
           cd export/release/ios/build/*-iphoneos
@@ -124,6 +138,7 @@ jobs:
           mv *.app Payload
           zip -r CodenameEngine.ipa Payload
       - name: Upload Artifact
+        if: ${{ success() }}
         uses: actions/upload-artifact@main
         with:
           name: iOSBuild

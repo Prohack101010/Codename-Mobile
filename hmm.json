@@ -11,7 +11,7 @@
       "name": "hscript-improved",
       "type": "git",
       "dir": null,
-      "ref": "1e55d0200b8bbaba55acc267c8c4f7a941225266",
+      "ref": "custom-classes",
       "url": "https://www.github.com/FNF-CNE-Devs/hscript-improved"
     },
     {
@@ -23,7 +23,7 @@
       "name": "away3d",
       "type": "git",
       "dir": null,
-      "ref": "911a1a4031a4089e90d4457b62bd2727c05baded",
+      "ref": "master",
       "url": "https://github.com/FNF-CNE-Devs/away3d"
     },
     {
@@ -40,14 +40,14 @@
       "name": "flixel",
       "type": "git",
       "dir": null,
-      "ref": "1315d63de72beae669535c7b319a826cf57a7fea",
+      "ref": "dev",
       "url": "https://github.com/FNF-CNE-Devs/flixel"
     },
     {
       "name": "flixel-addons",
       "type": "git",
       "dir": null,
-      "ref": "3efc01a12ea69d618e43b4ad697935517aee87f8",
+      "ref": "dev",
       "url": "https://github.com/FNF-CNE-Devs/flixel-addons"
     },
     {
@@ -58,30 +58,28 @@
       "url": "https://github.com/mcagabe19-stuff/hxcpp"
     },
     {
-      "name": "hxvlc",
-      "type": "haxelib",
-      "version": null
+       "name": "hxvlc",
+       "type": "haxelib",
+       "version": null
     },
     {
       "name": "hxdiscord_rpc",
       "type": "git",
       "dir": null,
-      "ref": "c11ed8a816a9e38a8153cb767cca20e84d50b511",
+      "ref": "main",
       "url": "https://github.com/FNF-CNE-Devs/hxdiscord_rpc"
     },
     {
       "name": "extension-androidtools",
-      "type": "git",
-      "dir": null,
-      "ref": "SAF",
-      "url": "https://github.com/PsychPorting/extension-androidtools-Base.git"
+      "type": "haxelib",
+      "version": null
     },
     {
       "name": "flxanimate",
       "type": "git",
       "dir": null,
-      "ref": "d7aa77bd795e8dcf508c2f7960f54b72f819017d",
+      "ref": "master",
       "url": "https://github.com/FNF-CNE-Devs/flxanimate"
     }
   ]
-    }
+}

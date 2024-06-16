@@ -14,8 +14,6 @@ labels: bug
 [ ] Windows
 [ ] Linux
 [ ] Mac
-[ ] Android
-[ ] iOS
 
 ### Explain your issue
 ##### Please check first if your issue haven't already been reported yet.

@@ -5,9 +5,7 @@ import android.content.Context;
 import android.os.Environment;
 import android.Permissions;
 import android.Settings;
-import funkin.options.Options;
 #end
-import lime.system.System as LimeSystem;
 import funkin.backend.utils.NativeAPI;
 #if sys
 import sys.io.File;
@@ -18,23 +16,33 @@ using StringTools;
 
 /**
  * A storage class for mobile.
- * @author Mihai Alexandru (M.A. Jigsaw)
+ * @author Mihai Alexandru (M.A. Jigsaw) and Lily (mcagabe19)
  */
 class SUtil
 {
 	#if sys
-	public static function getStorageDirectory(?force:Bool = false):String
+	public static function getStorageDirectory(?force:Bool = false #if (android), type:StorageType = #if EXTERNAL EXTERNAL #elseif OBB EXTERNAL_OBB #elseif MEDIA EXTERNAL_MEDIA #else EXTERNAL_DATA #end #end):String
 	{
 		#if mobile
 		var daPath:String;
 		#if android
-		if (!FileSystem.exists(LimeSystem.applicationStorageDirectory + 'storagetype.txt'))
-			File.saveContent(LimeSystem.applicationStorageDirectory + 'storagetype.txt', Options.storageType);
-		var curStorageType:String = File.getContent(LimeSystem.applicationStorageDirectory + 'storagetype.txt');
-		daPath = force ? StorageType.fromStrForce(curStorageType) : StorageType.fromStr(curStorageType);
+		var forcedPath:String = '/storage/emulated/0/';
+		var packageNameLocal:String = 'com.yoshman29.codenameengine';
+		var fileLocal:String = 'CodenameEngine';
+		switch (type)
+		{
+			case EXTERNAL_DATA:
+				daPath = force ? forcedPath + 'Android/data/' + packageNameLocal + '/files' : Context.getExternalFilesDir();
+			case EXTERNAL_OBB:
+				daPath = force ? forcedPath + 'Android/obb/' + packageNameLocal : Context.getObbDir();
+			case EXTERNAL_MEDIA:
+				daPath = force ? forcedPath + 'Android/media/' + packageNameLocal : Environment.getExternalStorageDirectory() + '/Android/media/' + lime.app.Application.current.meta.get('packageName');
+			case EXTERNAL:
+				daPath = force ? forcedPath + '.' + fileLocal : Environment.getExternalStorageDirectory() + '/.' + lime.app.Application.current.meta.get('file');
+		}
 		daPath = haxe.io.Path.addTrailingSlash(daPath);
 		#elseif ios
-		daPath = LimeSystem.documentsDirectory;
+		daPath = lime.system.System.documentsDirectory;
 		#end
 
 		return daPath;
@@ -91,16 +99,14 @@ class SUtil
 	#if android
 	public static function doPermissionsShit():Void
 	{
-		if (!Permissions.getGrantedPermissions().contains('android.permission.READ_EXTERNAL_STORAGE')
-			&& !Permissions.getGrantedPermissions().contains('android.permission.WRITE_EXTERNAL_STORAGE'))
+		if (!Permissions.getGrantedPermissions().contains(Permissions.READ_EXTERNAL_STORAGE)
+			&& !Permissions.getGrantedPermissions().contains(Permissions.WRITE_EXTERNAL_STORAGE))
 		{
-			Permissions.requestPermission('READ_EXTERNAL_STORAGE');
-			Permissions.requestPermission('WRITE_EXTERNAL_STORAGE');
-			NativeAPI.showMessageBox('Notice!',
-				'If you accepted the permissions you are all good!' + '\nIf you didn\'t then expect a crash' + '\nPress Ok to see what happens',
-				MSG_INFORMATION);
+			Permissions.requestPermission(Permissions.READ_EXTERNAL_STORAGE);
+			Permissions.requestPermission(Permissions.WRITE_EXTERNAL_STORAGE);
+			NativeAPI.showMessageBox('Notice!', 'If you accepted the permissions you are all good!' + '\nIf you didn\'t then expect a crash' + '\nPress Ok to see what happens', MSG_INFORMATION);
 			if (!Environment.isExternalStorageManager())
-				Settings.requestSetting('MANAGE_APP_ALL_FILES_ACCESS_PERMISSION');
+				Settings.requestSetting("android.settings.MANAGE_APP_ALL_FILES_ACCESS_PERMISSION");
 		}
 		else
 		{
@@ -111,70 +117,19 @@ class SUtil
 			}
 			catch (e:Dynamic)
 			{
-				NativeAPI.showMessageBox('Error!', 'Please create folder to\n' + SUtil.getStorageDirectory(true) + '\nPress OK to close the game', MSG_ERROR);
-				LimeSystem.exit(1);
+				NativeAPI.showMessageBox("Error!", "Please create folder to\n" + SUtil.getStorageDirectory(true) + "\nPress OK to close the game", MSG_ERROR);
+				lime.system.System.exit(1);
 			}
 		}
 	}
-
-	public static function checkExternalPaths(?splitStorage = false):Array<String> {
-		var process = new funkin.backend.utils.native.HiddenProcess('grep -o "/storage/....-...." /proc/mounts | paste -sd \',\'');
-		var paths:String = process.stdout.readAll().toString();
-		if (splitStorage) paths = paths.replace('/storage/', '');
-		return paths.split(',');
-	}
-
-	public static function getExternalDirectory(external:String):String {
-		var daPath:String = '';
-		for (path in checkExternalPaths())
-			if (path.contains(external)) daPath = path;
-
-		daPath = haxe.io.Path.addTrailingSlash(daPath.endsWith("\n") ? daPath.substr(0, daPath.length - 1) : daPath);
-		return daPath;
-	}
 	#end
 	#end
 }
 
-#if android
-enum abstract StorageType(String) from String to String
+enum StorageType
 {
-	final forcedPath = '/storage/emulated/0/';
-	final packageNameLocal = 'com.yoshman29.codenameengine';
-	final fileLocal = 'CodenameEngine';
-
-	public static function fromStr(str:String):StorageType
-	{
-		final EXTERNAL_DATA = Context.getExternalFilesDir();
-		final EXTERNAL_OBB = Context.getObbDir();
-		final EXTERNAL_MEDIA = Environment.getExternalStorageDirectory() + '/Android/media/' + lime.app.Application.current.meta.get('packageName');
-		final EXTERNAL = Environment.getExternalStorageDirectory() + '/.' + lime.app.Application.current.meta.get('file');
-
-		return switch (str)
-		{
-			case "EXTERNAL_DATA": EXTERNAL_DATA;
-			case "EXTERNAL_OBB": EXTERNAL_OBB;
-			case "EXTERNAL_MEDIA": EXTERNAL_MEDIA;
-			case "EXTERNAL": EXTERNAL;
-			default: SUtil.getExternalDirectory(str) + '.' + fileLocal;
-		}
-	}
-
-	public static function fromStrForce(str:String):StorageType
-	{
-		final EXTERNAL_DATA = forcedPath + 'Android/data/' + packageNameLocal + '/files';
-		final EXTERNAL_OBB = forcedPath + 'Android/obb/' + packageNameLocal;
-		final EXTERNAL_MEDIA = forcedPath + 'Android/media/' + packageNameLocal;
-		final EXTERNAL = forcedPath + '.' + fileLocal;
-
-		return switch (str)
-		{
-			case "EXTERNAL_DATA": EXTERNAL_DATA;
-			case "EXTERNAL_OBB": EXTERNAL_OBB;
-			case "EXTERNAL_MEDIA": EXTERNAL_MEDIA;
-			case "EXTERNAL": EXTERNAL;
-			default: SUtil.getExternalDirectory(str) + '.' + fileLocal;
-		}
-	}
+	EXTERNAL_DATA;
+	EXTERNAL_OBB;
+	EXTERNAL_MEDIA;
+	EXTERNAL;
 }
-#end

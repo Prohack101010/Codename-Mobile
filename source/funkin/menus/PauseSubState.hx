@@ -109,7 +109,7 @@ class PauseSubState extends MusicBeatSubstate
 
 		pauseScript.call("postCreate");
 
-		game.updateDiscordPresence();
+		PlayState.instance.updateDiscordPresence();
 
 		addVirtualPad('UP_DOWN', 'A_B');
 		addVirtualPadCamera();
@@ -152,7 +152,7 @@ class PauseSubState extends MusicBeatSubstate
 				close();
 			case "Restart Song":
 				parentDisabler.reset();
-				game.registerSmoothTransition();
+				PlayState.instance.registerSmoothTransition();
 				FlxG.resetState();
 			case "Change Controls":
 				var daSubstate:Class<MusicBeatSubstate> = MobileControls.mobileC ? MobileControlSelectSubState : KeybindsOptions;
@@ -164,7 +164,7 @@ class PauseSubState extends MusicBeatSubstate
 				FlxG.switchState(new funkin.editors.charter.Charter(PlayState.SONG.meta.name, PlayState.difficulty, false));
 			case "Exit to menu":
 				if (PlayState.chartingMode && Charter.undos.unsaved)
-					game.saveWarn(false);
+					PlayState.instance.saveWarn(false);
 				else {
 					PlayState.resetSongInfos();
 					if (Charter.instance != null) Charter.instance.__clearStatics();

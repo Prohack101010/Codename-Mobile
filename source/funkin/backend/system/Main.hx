@@ -63,7 +63,7 @@ class Main extends Sprite
 		instance = this;
 
 		#if mobile
-		#if android
+		#if (android && EXTERNAL || MEDIA)
 		SUtil.doPermissionsShit();
 		#end
 		Sys.setCwd(SUtil.getStorageDirectory(false));
@@ -158,7 +158,7 @@ class Main extends Sprite
 
 		FlxG.fixedTimestep = false;
 
-		if (!funkin.options.Options.wideScreen) FlxG.scaleMode = scaleMode = new FunkinRatioScaleMode();
+		FlxG.scaleMode = scaleMode = new FunkinRatioScaleMode();
 
 		Conductor.init();
 		AudioSwitchFix.init();
@@ -166,7 +166,7 @@ class Main extends Sprite
 		FlxG.signals.preStateSwitch.add(onStateSwitch);
 		FlxG.signals.postStateSwitch.add(onStateSwitchPost);
 
-		FlxG.mouse.useSystemCursor = !MobileControls.mobileC;
+		#if !mobile FlxG.mouse.useSystemCursor = true; #end
 
 		ModsFolder.init();
 		#if MOD_SUPPORT
@@ -200,7 +200,7 @@ class Main extends Sprite
 	}
 
 	private static function onStateSwitch() {
-		if (!funkin.options.Options.wideScreen) scaleMode.resetSize();
+		scaleMode.resetSize();
 	}
 
 	private static function onStateSwitchPost() {

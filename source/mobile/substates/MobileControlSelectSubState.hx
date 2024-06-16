@@ -23,7 +23,7 @@ using StringTools;
 
 class MobileControlSelectSubState extends MusicBeatSubstate
 {
-	var options:Array<String> = ['Pad-Right', 'Pad-Left', 'Pad-Custom', 'Hitbox', 'Keyboard'];
+	var options:Array<String> = ['Pad-Right', 'Pad-Left', 'Pad-Custom', 'Pad-Duo', 'Hitbox', 'Keyboard'];
 	var control:MobileControls;
 	var leftArrow:FlxSprite;
 	var rightArrow:FlxSprite;
@@ -209,6 +209,10 @@ class MobileControlSelectSubState extends MusicBeatSubstate
 				keyboardText.kill();
 				changeControls();
 			case 4:
+				reset.visible = false;
+				keyboardText.kill();
+				changeControls();
+			case 5:
 				reset.visible = false;
 				keyboardText.revive();
 				changeControls();
