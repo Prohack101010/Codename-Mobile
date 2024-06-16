@@ -18,11 +18,9 @@ class CharacterSelection extends EditorTreeMenu
 
 		var modsList:Array<String> = Character.getList(true);
 
-		final button:String = MobileControls.mobileC ? 'A' : 'ACCEPT';
-
 		var list:Array<OptionType> = [
 			for (char in (modsList.length == 0 ? Character.getList(false) : modsList))
-				new IconOption(char, "Press " + button + " to edit this character.", Character.getIconFromCharName(char),
+				new IconOption(char, "Press ACCEPT to edit this character.", Character.getIconFromCharName(char),
 			 	function() {
 					FlxG.switchState(new CharacterEditor(char));
 				})
@@ -34,9 +32,11 @@ class CharacterSelection extends EditorTreeMenu
 			]));
 		}));
 
-		main = new OptionsScreen("Character Editor", "Select a character to edit", list, 'UP_DOWN', 'A');
+		main = new OptionsScreen("Character Editor", "Select a character to edit", list);
 
 		DiscordUtil.call("onEditorTreeLoaded", ["Character Editor"]);
+
+		addVirtualPad('UP_DOWN', 'A_B');
 	}
 
 	override function createPost() {
