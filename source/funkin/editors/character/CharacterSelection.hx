@@ -35,7 +35,7 @@ class CharacterSelection extends EditorTreeMenu
 		main = new OptionsScreen("Character Editor", "Select a character to edit", list);
 
 		DiscordUtil.call("onEditorTreeLoaded", ["Character Editor"]);
-
+		
 		addVirtualPad('UP_DOWN', 'A_B');
 	}
 
