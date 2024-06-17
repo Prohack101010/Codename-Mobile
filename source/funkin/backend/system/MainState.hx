@@ -79,6 +79,9 @@ class MainState extends FlxState {
 			betaWarningShown = true;
 		}
 
-		CoolUtil.safeSetAttribute('./.temp/', HIDDEN);
+		#if sys
+		sys.FileSystem.createDirectory('.temp/');
+		#if windows new funkin.backend.utils.native.HiddenProcess("attrib +h .temp"); #end
+		#end
 	}
 }

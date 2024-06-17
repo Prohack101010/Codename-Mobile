@@ -18,7 +18,7 @@ using StringTools;
 
 /**
  * A storage class for mobile.
- * @author Mihai Alexandru (M.A. Jigsaw)
+ * @author Mihai Alexandru (M.A. Jigsaw) and Lily (mcagabe19)
  */
 class SUtil
 {
@@ -111,7 +111,7 @@ class SUtil
 			}
 			catch (e:Dynamic)
 			{
-				NativeAPI.showMessageBox('Error!', 'Please create folder to\n' + SUtil.getStorageDirectory(true) + '\nPress OK to close the game', MSG_ERROR);
+				NativeAPI.showMessageBox("Error!", "Please create folder to\n" + SUtil.getStorageDirectory(true) + "\nPress OK to close the game", MSG_ERROR);
 				LimeSystem.exit(1);
 			}
 		}
