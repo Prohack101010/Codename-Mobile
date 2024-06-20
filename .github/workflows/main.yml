@@ -95,7 +95,7 @@ jobs:
       # - name: Free Disk Space
         # run: sudo swapoff -a && sudo rm -f /swapfile && sudo apt clean && docker rmi $(docker image ls -aq)
       - name: Compile
-        run: haxelib run lime build android
+        run: haxelib run lime build android -arm64
       - name: Upload Artifact
         uses: actions/upload-artifact@main
         with:
